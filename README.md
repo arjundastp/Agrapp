@@ -1,0 +1,1 @@
+The project is agricultural support mobile application based on AI and machine learning tools. Also it includes forum discussion and networking between farmers which enables higher productivity rates .
