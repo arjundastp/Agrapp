@@ -1,62 +1,83 @@
-import 'package:agriplant/pages/orders_page.dart';
+//import 'package:agriplant/components/my_button.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_iconly/flutter_iconly.dart';
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+  ProfilePage({super.key});
+
+  final User? currentUser = FirebaseAuth.instance.currentUser;
+  Future<DocumentSnapshot<Map<String, dynamic>>> getUserDetails() async {
+    return await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(currentUser!.email)
+        .get();
+  }
+
+  void logout() {
+    FirebaseAuth.instance.signOut();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 20, bottom: 15),
-            child: CircleAvatar(
-              radius: 62,
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              child: const CircleAvatar(
-                radius: 60,
-                foregroundImage: NetworkImage(
-                    'https://images.unsplash.com/photo-1464863979621-258859e62245?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3386&q=80'),
+      appBar: AppBar(),
+      body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+        future: getUserDetails(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            return Text('Error : ${snapshot.error}');
+          } else if (snapshot.hasData) {
+            Map<String, dynamic>? user = snapshot.data!.data();
+            return SafeArea(
+              child: Center(
+                child: Column(
+                  children: [
+                    // const Row(
+                    //   children: [
+                    //     MyBackButton(),
+                    //   ],
+                    // ),
+                    const SizedBox(height: 30),
+                    Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(25),
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(25),
+                      child: const Icon(
+                        Icons.person,
+                        size: 64,
+                      ),
+                    ),
+                    Text(
+                      user!['username'],
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 24),
+                    ),
+                    Text(
+                      user['email'],
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.all(35.0),
+                      child: Text(
+                          'This mobile App is Developed as part of academic project of Btech CSE 2020-24 batch of MES  College of Engineering,   App version 0.1.2  Admin Contact: aaaan19212429@gmail.com'),
+                    )
+                  ],
+                ),
               ),
-            ),
-          ),
-          Center(
-            child: Text(
-              "MES College of Engineering,Kuttippuram",
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ),
-          Center(
-            child: Text(
-              "mesce123@mesce.ac.in",
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ),
-          const SizedBox(height: 25),
-          ListTile(
-            title: const Text("My orders"),
-            leading: const Icon(IconlyLight.bag),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const OrdersPage(),
-                  ));
-            },
-          ),
-          ListTile(
-            title: const Text("About us"),
-            leading: const Icon(IconlyLight.infoSquare),
-            onTap: () {},
-          ),
-          ListTile(
-            title: const Text("Logout"),
-            leading: const Icon(IconlyLight.logout),
-            onTap: () {},
-          ),
-        ],
+            );
+          } else {
+            return const Text('No data');
+          }
+        },
       ),
     );
   }

@@ -1,123 +1,83 @@
-import 'package:agriplant/data/products.dart';
-import 'package:agriplant/widgets/product_card.dart';
+import 'package:agriplant/components/my_button.dart';
+import 'package:agriplant/components/product_card.dart';
+import 'package:agriplant/database/firestore.dart';
+import 'package:agriplant/pages/manage_product_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_iconly/flutter_iconly.dart';
 
 class ExplorePage extends StatelessWidget {
-  const ExplorePage({super.key});
+  ExplorePage({super.key});
+  final FirestoreDatabase database = FirestoreDatabase();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 15),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: "Search here...",
-                      isDense: true,
-                      contentPadding: const EdgeInsets.all(12.0),
-                      border: const OutlineInputBorder(
-                        borderSide: BorderSide(),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(99),
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.grey.shade300,
-                        ),
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(99),
-                        ),
-                      ),
-                      prefixIcon: const Icon(IconlyLight.search),
-                    ),
-                  ),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: MyButton(
+            text: "Manage Products",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ManageProductPage(),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 12),
-                  child: IconButton.filled(
-                      onPressed: () {}, icon: const Icon(IconlyLight.filter)),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 25),
-            child: SizedBox(
-              height: 170,
-              child: Card(
-                color: Colors.green.shade50,
-                elevation: 0.1,
-                shadowColor: Colors.green.shade50,
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Flexible(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Free consultation",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge!
-                                  .copyWith(
-                                    color: Colors.green.shade700,
-                                  ),
-                            ),
-                            const Text("Get free support from our Admin Panel"),
-                            FilledButton(
-                              onPressed: () {},
-                              child: const Text("Call now"),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Image.asset(
-                        'assets/contact_us.png',
-                        width: 140,
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Featured Products from Developers",
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ],
-          ),
-          GridView.builder(
-            itemCount: products.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.9,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-            ),
-            itemBuilder: (context, index) {
-              return ProductCard(product: products[index]);
+              );
             },
-          )
-        ],
-      ),
+          ),
+        ),
+        StreamBuilder(
+          stream: database.getProductStream(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            final products = snapshot.data!.docs;
+            if (snapshot.data == null || products.isEmpty) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(25),
+                  child: Text('No products.....'),
+                ),
+              );
+            }
+            return Expanded(
+              child: ListView.builder(
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  String title = product['Title'];
+                  String userEmail = product['UserEmail'];
+                  String description = product['Description'];
+                  String phone = product['PhoneNo'];
+                  String price = product['Price'];
+                  String imageUrl = product['ImageUrl'];
+                  // Timestamp timestamp = post['TimeStamp'];
+
+                  //.............................................
+
+                  // List productList = snapshot.data!.docs;
+                  // DocumentSnapshot documentNew = productList[index];
+                  // String docID = documentNew.id;
+
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ProductCard(
+                        title: title,
+                        description: description,
+                        phone: phone,
+                        price: price,
+                        userEmail: userEmail,
+                        imageUrl: imageUrl),
+                  );
+                },
+              ),
+            );
+          },
+        )
+      ],
     );
   }
 }

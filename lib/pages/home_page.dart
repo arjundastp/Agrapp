@@ -1,8 +1,9 @@
+import 'package:agriplant/components/my_drawer.dart';
 import 'package:agriplant/pages/cart_page.dart';
 import 'package:agriplant/pages/explore_page.dart';
+import 'package:agriplant/pages/forum_page.dart';
 import 'package:agriplant/pages/profile_page.dart';
-import 'package:agriplant/pages/services_page.dart';
-import 'package:badges/badges.dart' as badges;
+//import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 
@@ -14,12 +15,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final pages = [
-    const ExplorePage(),
-    const ServicesPage(),
-    const CartPage(),
-    const ProfilePage()
-  ];
+  final pages = [ExplorePage(), ForumPage(), const CartPage(), ProfilePage()];
   int currentPageIndex = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -27,7 +23,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: const Drawer(),
+      drawer: const MyDrawer(),
       appBar: AppBar(
         centerTitle: false,
         leading: IconButton.filledTonal(
@@ -40,35 +36,13 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Hi MES College 👋🏾",
+              " Agrapp A farmer perfect companion 👋🏾",
               style: Theme.of(context).textTheme.titleMedium,
             ),
             Text("Welcome to Agrapp",
                 style: Theme.of(context).textTheme.bodySmall)
           ],
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: IconButton.filledTonal(
-              onPressed: () {},
-              icon: badges.Badge(
-                badgeContent: const Text(
-                  '4',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
-                ),
-                position: badges.BadgePosition.topEnd(top: -15, end: -12),
-                badgeStyle: const badges.BadgeStyle(
-                  badgeColor: Color.fromARGB(255, 186, 234, 53),
-                ),
-                child: const Icon(IconlyBroken.notification),
-              ),
-            ),
-          ),
-        ],
       ),
       body: pages[currentPageIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -86,19 +60,19 @@ class _HomePageState extends State<HomePage> {
             activeIcon: Icon(IconlyBold.home),
           ),
           BottomNavigationBarItem(
-            icon: Icon(IconlyLight.call),
+            icon: Icon(Icons.comment),
             label: "Forum",
-            activeIcon: Icon(IconlyBold.call),
+            activeIcon: Icon(Icons.insert_comment_outlined),
           ),
           BottomNavigationBarItem(
-            icon: Icon(IconlyLight.setting),
+            icon: Icon(Icons.local_florist),
             label: "AI Doctor",
-            activeIcon: Icon(IconlyBold.buy),
+            activeIcon: Icon(Icons.local_florist),
           ),
           BottomNavigationBarItem(
-            icon: Icon(IconlyLight.profile),
+            icon: Icon(Icons.person),
             label: "Profile",
-            activeIcon: Icon(IconlyBold.profile),
+            activeIcon: Icon(Icons.person),
           ),
         ],
       ),
